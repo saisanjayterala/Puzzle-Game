@@ -3,6 +3,8 @@ let timerInterval;
 let hintUsed = false;
 let hintsRemaining = 3;
 let timeLimit = 120;
+let score = 0;
+let originalPieces = [];
 
 function startTimer() {
     startTime = new Date();
@@ -48,6 +50,7 @@ function onDrop(event) {
         dropzone.appendChild(draggableElement);
         draggableElement.classList.add('correct');
         showMessage('Piece placed correctly!');
+        updateScore();
         checkCompletion();
     }
 }
@@ -66,7 +69,7 @@ function checkCompletion() {
     });
     if (completed) {
         stopTimer();
-        alert('Puzzle Completed!');
+        alert(`Puzzle Completed! Your score: ${score}`);
     }
 }
 
@@ -95,6 +98,7 @@ function startLevel(level) {
             break;
     }
 
+    originalPieces = [];
     for (let i = 1; i <= pieceCount; i++) {
         const piece = document.createElement('div');
         piece.className = 'puzzle-piece';
@@ -111,6 +115,7 @@ function startLevel(level) {
         }
 
         puzzleBoard.appendChild(piece);
+        originalPieces.push(piece.id);
 
         const slot = document.createElement('div');
         slot.className = 'puzzle-slot';
@@ -126,6 +131,9 @@ function startLevel(level) {
     hintUsed = false;
     hintsRemaining = 3;
     document.getElementById('hint-button').textContent = `Hint (${hintsRemaining})`;
+
+    score = 0;
+    document.getElementById('score').textContent = `Score: ${score}`;
 
     stopTimer();
     startTimer();
@@ -159,4 +167,38 @@ function shufflePieces() {
     for (let i = puzzleBoard.children.length; i >= 0; i--) {
         puzzleBoard.appendChild(puzzleBoard.children[Math.random() * i | 0]);
     }
+}
+
+function resetPuzzle() {
+    const puzzleBoard = document.querySelector('.puzzle-board');
+    const dropZone = document.querySelector('.drop-zone');
+
+    puzzleBoard.innerHTML = '';
+    dropZone.innerHTML = '';
+
+    originalPieces.forEach(id => {
+        const piece = document.getElementById(id);
+        puzzleBoard.appendChild(piece);
+    });
+
+    document.querySelectorAll('.puzzle-slot').forEach(slot => {
+        slot.style.borderColor = '#999';
+        slot.classList.remove('correct');
+    });
+
+    score = 0;
+    document.getElementById('score').textContent = `Score: ${score}`;
+
+    stopTimer();
+    startTimer();
+}
+
+function updateScore() {
+    const timeElapsed = Math.floor((new Date() - startTime) / 1000);
+    score = Math.max(0, 1000 - timeElapsed); // Example scoring formula
+    document.getElementById('score').textContent = `Score: ${score}`;
+}
+
+function setTheme(theme) {
+    document.body.className = theme + '-mode';
 }

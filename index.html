@@ -3,12 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puzzle Game - Version 4</title>
+    <title>Puzzle Game - Version 5</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <h1>Puzzle Game</h1>
+        <div id="theme-select">
+            <button class="theme-button" onclick="setTheme('light')">Light Mode</button>
+            <button class="theme-button" onclick="setTheme('dark')">Dark Mode</button>
+        </div>
         <div id="level-select">
             <button class="level-button" onclick="startLevel(1)">Level 1</button>
             <button class="level-button" onclick="startLevel(2)">Level 2</button>
@@ -17,8 +21,10 @@
         </div>
         <div id="game-area" style="display:none;">
             <div id="timer">Time: 02:00</div>
+            <div id="score">Score: 0</div>
             <button id="hint-button" onclick="showHint()">Hint</button>
             <button id="shuffle-button" onclick="shufflePieces()">Shuffle</button>
+            <button id="reset-button" onclick="resetPuzzle()">Reset</button>
             <div id="message"></div>
             <div class="puzzle-board"></div>
             <div class="drop-zone"></div>
