@@ -1,181 +1,97 @@
+:root {
+    --primary-color: #4CAF50;
+    --secondary-color: #45a049;
+    --background-color: #e8f5e9;
+    --text-color: #333;
+    --border-color: #2E7D32;
+}
+
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+    margin: 0;
+    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #e0f7fa;
-    padding: 20px;
-    box-sizing: border-box;
-    transition: background-color 0.3s;
-}
-
-body.dark-mode {
-    background-color: #212121;
-    color: #ffffff;
+    min-height: 100vh;
 }
 
 .container {
     text-align: center;
-    max-width: 600px;
-    width: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
-    margin-bottom: 20px;
-    color: #00796b;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
 }
 
-body.dark-mode h1 {
-    color: #4db6ac;
+#game-controls {
+    margin-bottom: 1rem;
 }
 
-#theme-select, #multiplayer-select, #level-select, #difficulty-select {
-    margin-bottom: 20px;
-}
-
-.theme-button, .multiplayer-button, .level-button, .difficulty-button {
-    margin: 10px;
-    padding: 10px 20px;
-    background-color: #00796b;
+button, select {
+    background-color: var(--primary-color);
     color: white;
     border: none;
+    padding: 0.5rem 1rem;
+    margin: 0.5rem;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 18px;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s ease;
 }
 
-.theme-button:hover, .multiplayer-button:hover, .level-button:hover, .difficulty-button:hover {
-    background-color: #004d40;
+button:hover, select:hover {
+    background-color: var(--secondary-color);
 }
 
-#game-area {
-    text-align: center;
-}
-
-#timer, #score {
-    font-size: 24px;
-    margin-bottom: 10px;
-}
-
-#score {
-    color: #388e3c;
-}
-
-body.dark-mode #score {
-    color: #81c784;
-}
-
-#hint-button, #shuffle-button, #reset-button {
-    padding: 10px 20px;
-    background-color: #0288d1;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-bottom: 20px;
-    font-size: 18px;
-    transition: background-color 0.3s;
-}
-
-#shuffle-button {
-    background-color: #d32f2f;
-    margin-left: 10px;
-}
-
-#reset-button {
-    background-color: #ffa000;
-    margin-left: 10px;
-}
-
-#hint-button:hover, #shuffle-button:hover, #reset-button:hover {
-    opacity: 0.8;
-}
-
-#message {
-    font-size: 18px;
-    color: #f57c00;
-    margin-bottom: 20px;
-}
-
-.puzzle-board {
-    display: flex;
-    justify-content: space-around;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
+#puzzle-container {
+    display: inline-grid;
+    gap: 5px;
+    padding: 10px;
+    background-color: var(--border-color);
+    border-radius: 10px;
 }
 
 .puzzle-piece {
-    width: 80px;
-    height: 80px;
-    background-color: #4CAF50;
-    color: white;
+    width: 100px;
+    height: 100px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 24px;
-    cursor: move;
-    margin: 5px;
-    border-radius: 10%;
-    transition: background-color 0.3s, transform 0.3s;
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+    background-size: cover;
+    background-position: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    border-radius: 5px;
 }
 
-.puzzle-piece.circle {
-    border-radius: 50%;
+.puzzle-piece:hover {
+    transform: scale(1.05);
 }
 
-.puzzle-piece.triangle {
-    width: 0;
-    height: 0;
-    border-left: 40px solid transparent;
-    border-right: 40px solid transparent;
-    border-bottom: 80px solid #4CAF50;
-    background-color: transparent;
+#game-info {
+    margin-top: 1rem;
+    font-size: 1.2rem;
 }
 
-.puzzle-piece.correct {
-    background-color: #8bc34a;
-    animation: correctPlacement 0.5s ease;
+#message {
+    margin-top: 1rem;
+    font-weight: bold;
+    color: var(--primary-color);
 }
 
-@keyframes correctPlacement {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
-}
-
-.drop-zone {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-}
-
-.puzzle-slot {
-    width: 80px;
-    height: 80px;
-    background-color: #ddd;
-    margin: 5px;
-    border: 2px dashed #999;
-    transition: border-color 0.3s;
-    border-radius: 10%;
-}
-
-.puzzle-slot.occupied {
-    background-color: #c8e6c9;
-}
-
-#leaderboard, #profile {
-    margin-top: 20px;
-}
-
-#leaderboard h2, #profile h2 {
-    color: #00796b;
-}
-
-body.dark-mode #leaderboard h2, body.dark-mode #profile h2 {
-    color: #4db6ac;
+#leaderboard {
+    margin-top: 2rem;
 }
 
 #leaderboard-list {
@@ -184,29 +100,23 @@ body.dark-mode #leaderboard h2, body.dark-mode #profile h2 {
 }
 
 #leaderboard-list li {
-    font-size: 18px;
-    margin-bottom: 5px;
+    margin: 0.5rem 0;
+    font-size: 1.1rem;
 }
 
-#profile-info {
-    font-size: 18px;
-}
-
-#profile-name {
-    padding: 10px;
-    font-size: 18px;
-    margin-bottom: 10px;
+/* Dark theme */
+body.dark-theme {
+    --primary-color: #66BB6A;
+    --secondary-color: #81C784;
+    --background-color: #1E1E1E;
+    --text-color: #E0E0E0;
+    --border-color: #388E3C;
 }
 
 @media (max-width: 600px) {
-    .puzzle-piece, .puzzle-slot {
-        width: 60px;
-        height: 60px;
-    }
-
-    .puzzle-piece.triangle {
-        border-left: 30px solid transparent;
-        border-right: 30px solid transparent;
-        border-bottom: 60px solid #4CAF50;
+    .puzzle-piece {
+        width: 80px;
+        height: 80px;
+        font-size: 1.5rem;
     }
 }

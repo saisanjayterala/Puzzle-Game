@@ -3,49 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puzzle Game - Version 8</title>
+    <title>Nature Puzzle Slider - Version 9</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Puzzle Game</h1>
-        <div id="theme-select">
-            <button class="theme-button" onclick="setTheme('light')">Light Mode</button>
-            <button class="theme-button" onclick="setTheme('dark')">Dark Mode</button>
+        <h1>Nature Puzzle Slider</h1>
+        <div id="game-controls">
+            <button id="start-button">Start Game</button>
+            <select id="difficulty">
+                <option value="3">Easy (3x3)</option>
+                <option value="4">Medium (4x4)</option>
+                <option value="5">Hard (5x5)</option>
+            </select>
+            <button id="theme-toggle">Toggle Theme</button>
         </div>
-        <div id="multiplayer-select">
-            <button class="multiplayer-button" onclick="startMultiplayer()">Multiplayer</button>
+        <div id="game-area">
+            <div id="puzzle-container"></div>
+            <div id="game-info">
+                <p id="moves">Moves: 0</p>
+                <p id="timer">Time: 00:00</p>
+            </div>
         </div>
-        <div id="level-select">
-            <button class="level-button" onclick="startLevel(1)">Level 1</button>
-            <button class="level-button" onclick="startLevel(2)">Level 2</button>
-            <button class="level-button" onclick="startLevel(3)">Level 3</button>
-            <button class="level-button" onclick="startLevel(4)">Level 4</button>
-        </div>
-        <div id="difficulty-select">
-            <button class="difficulty-button" onclick="setDifficulty('easy')">Easy</button>
-            <button class="difficulty-button" onclick="setDifficulty('medium')">Medium</button>
-            <button class="difficulty-button" onclick="setDifficulty('hard')">Hard</button>
-        </div>
-        <div id="game-area" style="display:none;">
-            <div id="timer">Time: 02:00</div>
-            <div id="score">Score: 0</div>
-            <button id="hint-button" onclick="showHint()">Hint (3)</button>
-            <button id="shuffle-button" onclick="shufflePieces()">Shuffle</button>
-            <button id="reset-button" onclick="resetPuzzle()">Reset</button>
-            <div id="message"></div>
-            <div class="puzzle-board"></div>
-            <div class="drop-zone"></div>
-        </div>
-        <div id="leaderboard" style="display:none;">
+        <div id="message"></div>
+        <div id="leaderboard">
             <h2>Leaderboard</h2>
             <ul id="leaderboard-list"></ul>
-        </div>
-        <div id="profile" style="display:none;">
-            <h2>Player Profile</h2>
-            <div id="profile-info"></div>
-            <input type="text" id="profile-name" placeholder="Enter your name">
-            <button onclick="updateProfileName()">Update Name</button>
         </div>
     </div>
     <script src="script.js"></script>

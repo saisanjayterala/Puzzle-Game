@@ -1,283 +1,197 @@
-let startTime;
-let timerInterval;
-let hintUsed = false;
-let hintsRemaining = 3;
-let timeLimit = 120;
-let score = 0;
-let originalPieces = [];
-let difficulty = 'medium';
+let puzzle = [];
+let emptyTile = { row: 0, col: 0 };
+let moves = 0;
+let timer;
+let seconds = 0;
+let gameStarted = false;
 let leaderboard = [];
-let playerProfile = { name: 'Player', highScore: 0 };
-let currentLevel = 1;
 
-function startTimer() {
-    startTime = new Date();
-    timerInterval = setInterval(updateTimer, 1000);
+const images = [
+    'https://source.unsplash.com/300x300/?nature,water',
+    'https://source.unsplash.com/300x300/?nature,forest',
+    'https://source.unsplash.com/300x300/?nature,mountain',
+    'https://source.unsplash.com/300x300/?nature,beach',
+    'https://source.unsplash.com/300x300/?nature,sunset'
+];
+
+function initGame() {
+    const difficultySelect = document.getElementById('difficulty');
+    const size = parseInt(difficultySelect.value);
+    createPuzzle(size);
+    displayPuzzle();
+    resetGameState();
+}
+
+function createPuzzle(size) {
+    puzzle = [];
+    for (let i = 0; i < size; i++) {
+        puzzle[i] = [];
+        for (let j = 0; j < size; j++) {
+            puzzle[i][j] = i * size + j + 1;
+        }
+    }
+    emptyTile = { row: size - 1, col: size - 1 };
+    puzzle[emptyTile.row][emptyTile.col] = 0;
+    shufflePuzzle(size);
+}
+
+function shufflePuzzle(size) {
+    for (let i = 0; i < 1000; i++) {
+        const directions = [
+            { dx: -1, dy: 0 },
+            { dx: 1, dy: 0 },
+            { dx: 0, dy: -1 },
+            { dx: 0, dy: 1 }
+        ];
+        const validMoves = directions.filter(dir => {
+            const newRow = emptyTile.row + dir.dx;
+            const newCol = emptyTile.col + dir.dy;
+            return newRow >= 0 && newRow < size && newCol >= 0 && newCol < size;
+        });
+        const randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
+        const newRow = emptyTile.row + randomMove.dx;
+        const newCol = emptyTile.col + randomMove.dy;
+        puzzle[emptyTile.row][emptyTile.col] = puzzle[newRow][newCol];
+        puzzle[newRow][newCol] = 0;
+        emptyTile = { row: newRow, col: newCol };
+    }
+}
+
+function displayPuzzle() {
+    const container = document.getElementById('puzzle-container');
+    container.innerHTML = '';
+    container.style.gridTemplateColumns = `repeat(${puzzle.length}, 1fr)`;
+
+    const imageIndex = Math.floor(Math.random() * images.length);
+    const imageUrl = images[imageIndex];
+
+    for (let i = 0; i < puzzle.length; i++) {
+        for (let j = 0; j < puzzle[i].length; j++) {
+            const piece = document.createElement('div');
+            piece.classList.add('puzzle-piece');
+            if (puzzle[i][j] !== 0) {
+                piece.textContent = puzzle[i][j];
+                const bgPositionX = ((puzzle[i][j] - 1) % puzzle.length) / (puzzle.length - 1) * 100;
+                const bgPositionY = Math.floor((puzzle[i][j] - 1) / puzzle.length) / (puzzle.length - 1) * 100;
+                piece.style.backgroundImage = `url(${imageUrl})`;
+                piece.style.backgroundPosition = `${bgPositionX}% ${bgPositionY}%`;
+                piece.addEventListener('click', () => movePiece(i, j));
+            } else {
+                piece.style.opacity = '0';
+            }
+            container.appendChild(piece);
+        }
+    }
+}
+
+function movePiece(row, col) {
+    if (!gameStarted) {
+        startGame();
+    }
+
+    const directions = [
+        { dx: -1, dy: 0 },
+        { dx: 1, dy: 0 },
+        { dx: 0, dy: -1 },
+        { dx: 0, dy: 1 }
+    ];
+
+    for (const dir of directions) {
+        const newRow = row + dir.dx;
+        const newCol = col + dir.dy;
+        if (newRow === emptyTile.row && newCol === emptyTile.col) {
+            puzzle[emptyTile.row][emptyTile.col] = puzzle[row][col];
+            puzzle[row][col] = 0;
+            emptyTile = { row, col };
+            moves++;
+            updateMoves();
+            displayPuzzle();
+            checkWin();
+            return;
+        }
+    }
+}
+
+function checkWin() {
+    const size = puzzle.length;
+    for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+            if (i === size - 1 && j === size - 1) {
+                if (puzzle[i][j] !== 0) return;
+            } else if (puzzle[i][j] !== i * size + j + 1) {
+                return;
+            }
+        }
+    }
+    endGame();
+}
+
+function startGame() {
+    gameStarted = true;
+    timer = setInterval(updateTimer, 1000);
+    document.getElementById('start-button').textContent = 'Restart';
+}
+
+function endGame() {
+    clearInterval(timer);
+    const time = formatTime(seconds);
+    const message = `Congratulations! You solved the puzzle in ${moves} moves and ${time}.`;
+    document.getElementById('message').textContent = message;
+    updateLeaderboard();
+}
+
+function resetGameState() {
+    moves = 0;
+    seconds = 0;
+    gameStarted = false;
+    clearInterval(timer);
+    updateMoves();
+    updateTimer();
+    document.getElementById('message').textContent = '';
+    document.getElementById('start-button').textContent = 'Start Game';
+}
+
+function updateMoves() {
+    document.getElementById('moves').textContent = `Moves: ${moves}`;
 }
 
 function updateTimer() {
-    const now = new Date();
-    const elapsedTime = Math.floor((now - startTime) / 1000);
-    const remainingTime = timeLimit - elapsedTime;
-    if (remainingTime <= 0) {
-        clearInterval(timerInterval);
-        alert('Time\'s up! Game over.');
-        return;
-    }
-    const minutes = String(Math.floor(remainingTime / 60)).padStart(2, '0');
-    const seconds = String(remainingTime % 60).padStart(2, '0');
-    document.getElementById('timer').textContent = `Time: ${minutes}:${seconds}`;
+    const time = formatTime(seconds);
+    document.getElementById('timer').textContent = `Time: ${time}`;
+    seconds++;
 }
 
-function stopTimer() {
-    clearInterval(timerInterval);
+function formatTime(totalSeconds) {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
-function showMessage(message) {
-    const messageElement = document.getElementById('message');
-    messageElement.textContent = message;
-    messageElement.style.display = 'block';
-    setTimeout(() => {
-        messageElement.style.display = 'none';
-    }, 3000);
-}
-
-function onDragStart(event) {
-    event.dataTransfer.setData('text/plain', event.target.id);
-}
-
-function onDragOver(event) {
-    event.preventDefault();
-}
-
-function onDrop(event) {
-    event.preventDefault();
-    const id = event.dataTransfer.getData('text/plain');
-    const piece = document.getElementById(id);
-    const slot = event.target;
-    if (slot.classList.contains('puzzle-slot') && !slot.hasChildNodes()) {
-        slot.appendChild(piece);
-        piece.classList.add('correct');
-        updateScore();
-        checkCompletion();
-    }
-}
-
-function checkCompletion() {
-    const slots = document.querySelectorAll('.puzzle-slot');
-    let completed = true;
-    slots.forEach(slot => {
-        if (!slot.hasChildNodes()) {
-            completed = false;
-        }
-    });
-    if (completed) {
-        stopTimer();
-        const finalScore = score;
-        showMessage(`Puzzle Completed! Your score: ${finalScore}`);
-        updateLeaderboard(finalScore);
-        displayLeaderboard();
-        savePlayerProfile(finalScore);
-        displayProfile();
-    }
-}
-
-function startLevel(level) {
-    currentLevel = level;
-    const gameArea = document.getElementById('game-area');
-    const puzzleBoard = document.querySelector('.puzzle-board');
-    const dropZone = document.querySelector('.drop-zone');
-    const levelSelect = document.getElementById('level-select');
-
-    puzzleBoard.innerHTML = '';
-    dropZone.innerHTML = '';
-
-    let pieceCount;
-    switch (level) {
-        case 1:
-            pieceCount = 4;
-            break;
-        case 2:
-            pieceCount = 6;
-            break;
-        case 3:
-            pieceCount = 9;
-            break;
-        case 4:
-            pieceCount = 12;
-            break;
-    }
-
-    originalPieces = [];
-    for (let i = 1; i <= pieceCount; i++) {
-        const piece = document.createElement('div');
-        piece.className = 'puzzle-piece';
-        piece.id = `piece${i}`;
-        piece.textContent = i;
-        piece.draggable = true;
-        piece.addEventListener('dragstart', onDragStart);
-
-        if (difficulty === 'hard' && i % 3 === 0) {
-            piece.classList.add('triangle');
-            piece.textContent = '';
-        } else if (difficulty === 'medium' && i % 2 === 0) {
-            piece.classList.add('circle');
-        }
-
-        puzzleBoard.appendChild(piece);
-        originalPieces.push(piece);
-
-        const slot = document.createElement('div');
-        slot.className = 'puzzle-slot';
-        slot.id = `slot${i}`;
-        slot.addEventListener('dragover', onDragOver);
-        slot.addEventListener('drop', onDrop);
-        dropZone.appendChild(slot);
-    }
-
-    levelSelect.style.display = 'none';
-    gameArea.style.display = 'block';
-
-    hintUsed = false;
-    hintsRemaining = 3;
-    document.getElementById('hint-button').textContent = `Hint (${hintsRemaining})`;
-
-    score = 0;
-    document.getElementById('score').textContent = `Score: ${score}`;
-
-    stopTimer();
-    startTimer();
-}
-
-function showHint() {
-    if (hintUsed || hintsRemaining <= 0) return;
-    hintUsed = true;
-    hintsRemaining--;
-    const hintButton = document.getElementById('hint-button');
-    hintButton.textContent = `Hint (${hintsRemaining})`;
-    hintButton.disabled = hintsRemaining <= 0;
-
-    const slots = document.querySelectorAll('.puzzle-slot');
-    slots.forEach(slot => {
-        if (!slot.hasChildNodes()) {
-            slot.style.borderColor = '#ff5722';
-        }
-    });
-
-    setTimeout(() => {
-        slots.forEach(slot => {
-            slot.style.borderColor = '#999';
-        });
-        hintUsed = false;
-    }, 2000);
-}
-
-function shufflePieces() {
-    const puzzleBoard = document.querySelector('.puzzle-board');
-    for (let i = puzzleBoard.children.length; i >= 0; i--) {
-        puzzleBoard.appendChild(puzzleBoard.children[Math.random() * i | 0]);
-    }
-}
-
-function resetPuzzle() {
-    const puzzleBoard = document.querySelector('.puzzle-board');
-    const dropZone = document.querySelector('.drop-zone');
-
-    // Clear both puzzle board and drop zone
-    puzzleBoard.innerHTML = '';
-    dropZone.innerHTML = '';
-
-    // Recreate puzzle pieces and slots
-    originalPieces.forEach((piece, index) => {
-        const newPiece = piece.cloneNode(true);
-        newPiece.classList.remove('correct');
-        newPiece.style.transform = 'none';
-        newPiece.addEventListener('dragstart', onDragStart);
-        puzzleBoard.appendChild(newPiece);
-
-        const slot = document.createElement('div');
-        slot.className = 'puzzle-slot';
-        slot.id = `slot${index + 1}`;
-        slot.addEventListener('dragover', onDragOver);
-        slot.addEventListener('drop', onDrop);
-        dropZone.appendChild(slot);
-    });
-
- // Reset game state
- score = 0;
- document.getElementById('score').textContent = `Score: ${score}`;
-
- hintUsed = false;
- hintsRemaining = 3;
- document.getElementById('hint-button').textContent = `Hint (${hintsRemaining})`;
- document.getElementById('hint-button').disabled = false;
-
- // Restart timer
- stopTimer();
- startTimer();
-}
-
-function updateScore() {
- const timeElapsed = Math.floor((new Date() - startTime) / 1000);
- score = Math.max(0, 1000 - timeElapsed * 5);
- document.getElementById('score').textContent = `Score: ${score}`;
-}
-
-function setTheme(theme) {
- document.body.className = theme + '-mode';
-}
-
-function startMultiplayer() {
- alert('Multiplayer mode is coming soon!');
-}
-
-function setDifficulty(level) {
- difficulty = level;
- showMessage(`Difficulty set to ${level}`);
-}
-
-function updateLeaderboard(finalScore) {
- leaderboard.push({ name: playerProfile.name, score: finalScore, level: currentLevel });
- leaderboard.sort((a, b) => b.score - a.score);
- leaderboard = leaderboard.slice(0, 5); // Keep top 5 scores
+function updateLeaderboard() {
+    const difficulty = document.getElementById('difficulty').value;
+    const entry = { difficulty, moves, time: formatTime(seconds) };
+    leaderboard.push(entry);
+    leaderboard.sort((a, b) => a.moves - b.moves);
+    leaderboard = leaderboard.slice(0, 5);
+    displayLeaderboard();
 }
 
 function displayLeaderboard() {
- const leaderboardList = document.getElementById('leaderboard-list');
- leaderboardList.innerHTML = '';
- leaderboard.forEach((entry, index) => {
-     const li = document.createElement('li');
-     li.textContent = `${index + 1}. ${entry.name} - Score: ${entry.score} (Level ${entry.level})`;
-     leaderboardList.appendChild(li);
- });
- document.getElementById('leaderboard').style.display = 'block';
+    const leaderboardList = document.getElementById('leaderboard-list');
+    leaderboardList.innerHTML = '';
+    leaderboard.forEach((entry, index) => {
+        const li = document.createElement('li');
+        li.textContent = `${index + 1}. ${entry.difficulty}x${entry.difficulty} - Moves: ${entry.moves}, Time: ${entry.time}`;
+        leaderboardList.appendChild(li);
+    });
 }
 
-function savePlayerProfile(finalScore) {
- if (finalScore > playerProfile.highScore) {
-     playerProfile.highScore = finalScore;
- }
+function toggleTheme() {
+    document.body.classList.toggle('dark-theme');
 }
 
-function displayProfile() {
- const profileInfo = document.getElementById('profile-info');
- profileInfo.innerHTML = `<p>Name: ${playerProfile.name}</p><p>High Score: ${playerProfile.highScore}</p>`;
- document.getElementById('profile').style.display = 'block';
-}
+document.getElementById('start-button').addEventListener('click', initGame);
+document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+document.getElementById('difficulty').addEventListener('change', initGame);
 
-function updateProfileName() {
- const newName = document.getElementById('profile-name').value.trim();
- if (newName) {
-     playerProfile.name = newName;
-     displayProfile();
-     showMessage(`Profile name updated to ${newName}`);
- } else {
-     showMessage('Please enter a valid name');
- }
-}
-
-// Initialize the game
-document.addEventListener('DOMContentLoaded', () => {
- displayProfile();
- document.getElementById('level-select').style.display = 'block';
-});
+initGame();
