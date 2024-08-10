@@ -5,6 +5,7 @@ let hintsRemaining = 3;
 let timeLimit = 120;
 let score = 0;
 let originalPieces = [];
+let difficulty = 'medium';
 
 function startTimer() {
     startTime = new Date();
@@ -49,6 +50,7 @@ function onDrop(event) {
     if (dropzone.classList.contains('puzzle-slot') && !dropzone.hasChildNodes()) {
         dropzone.appendChild(draggableElement);
         draggableElement.classList.add('correct');
+        dropzone.classList.add('occupied');
         showMessage('Piece placed correctly!');
         updateScore();
         checkCompletion();
@@ -69,7 +71,7 @@ function checkCompletion() {
     });
     if (completed) {
         stopTimer();
-        alert(`Puzzle Completed! Your score: ${score}`);
+        showMessage('Puzzle completed!');
     }
 }
 
@@ -107,10 +109,10 @@ function startLevel(level) {
         piece.draggable = true;
         piece.addEventListener('dragstart', onDragStart);
 
-        if (level >= 4 && i % 3 === 0) {
+        if (difficulty === 'hard' && i % 3 === 0) {
             piece.classList.add('triangle');
             piece.textContent = '';
-        } else if (level >= 4 && i % 2 === 0) {
+        } else if (difficulty === 'medium' && i % 2 === 0) {
             piece.classList.add('circle');
         }
 
@@ -184,6 +186,7 @@ function resetPuzzle() {
     document.querySelectorAll('.puzzle-slot').forEach(slot => {
         slot.style.borderColor = '#999';
         slot.classList.remove('correct');
+        slot.classList.remove('occupied');
     });
 
     score = 0;
@@ -201,4 +204,13 @@ function updateScore() {
 
 function setTheme(theme) {
     document.body.className = theme + '-mode';
+}
+
+function startMultiplayer() {
+    alert('Multiplayer mode is not implemented yet.');
+}
+
+function setDifficulty(level) {
+    difficulty = level;
+    alert(`Difficulty set to ${level}`);
 }

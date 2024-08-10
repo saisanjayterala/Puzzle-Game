@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puzzle Game - Version 5</title>
+    <title>Puzzle Game - Version 6</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -13,11 +13,19 @@
             <button class="theme-button" onclick="setTheme('light')">Light Mode</button>
             <button class="theme-button" onclick="setTheme('dark')">Dark Mode</button>
         </div>
+        <div id="multiplayer-select">
+            <button class="multiplayer-button" onclick="startMultiplayer()">Multiplayer</button>
+        </div>
         <div id="level-select">
             <button class="level-button" onclick="startLevel(1)">Level 1</button>
             <button class="level-button" onclick="startLevel(2)">Level 2</button>
             <button class="level-button" onclick="startLevel(3)">Level 3</button>
             <button class="level-button" onclick="startLevel(4)">Level 4</button>
+        </div>
+        <div id="difficulty-select">
+            <button class="difficulty-button" onclick="setDifficulty('easy')">Easy</button>
+            <button class="difficulty-button" onclick="setDifficulty('medium')">Medium</button>
+            <button class="difficulty-button" onclick="setDifficulty('hard')">Hard</button>
         </div>
         <div id="game-area" style="display:none;">
             <div id="timer">Time: 02:00</div>
@@ -31,5 +39,5 @@
         </div>
     </div>
     <script src="script.js"></script>
-</body>
+  </body>
 </html>

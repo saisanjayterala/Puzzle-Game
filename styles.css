@@ -26,11 +26,11 @@ h1 {
     color: #00796b;
 }
 
-#theme-select {
+#theme-select, #multiplayer-select, #level-select, #difficulty-select {
     margin-bottom: 20px;
 }
 
-.theme-button {
+.theme-button, .multiplayer-button, .level-button, .difficulty-button {
     margin: 10px;
     padding: 10px 20px;
     background-color: #00796b;
@@ -41,26 +41,7 @@ h1 {
     font-size: 18px;
 }
 
-.theme-button:hover {
-    background-color: #004d40;
-}
-
-#level-select {
-    margin-bottom: 20px;
-}
-
-.level-button {
-    margin: 10px;
-    padding: 10px 20px;
-    background-color: #00796b;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 18px;
-}
-
-.level-button:hover {
+.theme-button:hover, .multiplayer-button:hover, .level-button:hover, .difficulty-button:hover {
     background-color: #004d40;
 }
 
@@ -126,7 +107,7 @@ h1 {
     cursor: move;
     margin: 5px;
     border-radius: 10%;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.3s;
 }
 
 .puzzle-piece.circle {
@@ -167,6 +148,10 @@ h1 {
     border: 2px dashed #999;
     transition: border-color 0.3s;
     border-radius: 10%;
+}
+
+.puzzle-slot.occupied {
+    background-color: #c8e6c9;
 }
 
 @media (max-width: 600px) {
