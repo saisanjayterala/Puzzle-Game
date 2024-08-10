@@ -7,12 +7,18 @@ let gameStarted = false;
 let leaderboard = [];
 let currentImageUrl = '';
 
+const themes = [
+    { primary: '#FF6B6B', secondary: '#4ECDC4', background: '#F7FFF7', text: '#1A535C', accent: '#FFE66D' },
+    { primary: '#6B5B95', secondary: '#FF7B54', background: '#F8F3EB', text: '#34435E', accent: '#FEC8D8' },
+    { primary: '#00B8A9', secondary: '#F8F3D4', background: '#EAFFD0', text: '#2F4858', accent: '#F6416C' },
+    { primary: '#3D84A8', secondary: '#46CDCF', background: '#ABEDD8', text: '#1B2021', accent: '#F7FD04' }
+];
+
 const images = [
-    'https://source.unsplash.com/400x400/?nature,water',
-    'https://source.unsplash.com/400x400/?nature,forest',
-    'https://source.unsplash.com/400x400/?nature,mountain',
-    'https://source.unsplash.com/400x400/?nature,beach',
-    'https://source.unsplash.com/400x400/?nature,sunset'
+    'https://example.com/nature1.jpg',
+    'https://example.com/nature2.jpg',
+    'https://example.com/nature3.jpg',
+    // Add more image URLs as needed
 ];
 
 function initGame() {
@@ -67,18 +73,21 @@ function displayPuzzle() {
     for (let i = 0; i < puzzle.length; i++) {
         for (let j = 0; j < puzzle[i].length; j++) {
             const piece = document.createElement('div');
-            piece.classList.add('puzzle-piece', 'fade-in');
+            piece.classList.add('puzzle-piece');
             if (puzzle[i][j] !== 0) {
                 piece.textContent = puzzle[i][j];
-                const bgPositionX = ((puzzle[i][j] - 1) % puzzle.length) / (puzzle.length - 1) * 100;
-                const bgPositionY = Math.floor((puzzle[i][j] - 1) / puzzle.length) / (puzzle.length - 1) * 100;
-                piece.style.backgroundImage = `url(${currentImageUrl})`;
-                piece.style.backgroundPosition = `${bgPositionX}% ${bgPositionY}%`;
                 piece.addEventListener('click', () => movePiece(i, j));
             } else {
                 piece.style.opacity = '0';
             }
             container.appendChild(piece);
+            gsap.from(piece, { 
+                duration: 0.5, 
+                scale: 0, 
+                opacity: 0, 
+                delay: (i * puzzle.length + j) * 0.05,
+                ease: "back.out(1.7)"
+            });
         }
     }
 }
@@ -99,13 +108,12 @@ function movePiece(row, col) {
         const newRow = row + dir.dx;
         const newCol = col + dir.dy;
         if (newRow === emptyTile.row && newCol === emptyTile.col) {
+            animateMove(row, col, newRow, newCol);
             puzzle[emptyTile.row][emptyTile.col] = puzzle[row][col];
             puzzle[row][col] = 0;
             emptyTile = { row, col };
             moves++;
             updateMoves();
-            displayPuzzle();
-            animateMove(row, col, newRow, newCol);
             checkWin();
             return;
         }
@@ -120,22 +128,16 @@ function animateMove(fromRow, fromCol, toRow, toCol) {
     const fromPiece = pieces[fromIndex];
     const toPiece = pieces[toIndex];
 
-    const fromRect = fromPiece.getBoundingClientRect();
-    const toRect = toPiece.getBoundingClientRect();
-
-    const deltaX = toRect.left - fromRect.left;
-    const deltaY = toRect.top - fromRect.top;
-
-    fromPiece.style.zIndex = '10';
-    fromPiece.style.transition = 'transform 0.3s ease-in-out';
-    fromPiece.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-
-    setTimeout(() => {
-        fromPiece.style.zIndex = '';
-        fromPiece.style.transition = '';
-        fromPiece.style.transform = '';
-        displayPuzzle();
-    }, 300);
+    gsap.to(fromPiece, {
+        duration: 0.3,
+        x: (toCol - fromCol) * 100 + '%',
+        y: (toRow - fromRow) * 100 + '%',
+        ease: "power2.inOut",
+        onComplete: () => {
+            gsap.set(fromPiece, { x: 0, y: 0 });
+            displayPuzzle();
+        }
+    });
 }
 
 function checkWin() {
@@ -163,7 +165,7 @@ function endGame() {
     const time = formatTime(seconds);
     const message = `Congratulations! You solved the puzzle in ${moves} moves and ${time}.`;
     document.getElementById('message').textContent = message;
-    document.getElementById('message').classList.add('slide-in');
+    gsap.from('#message', { duration: 0.5, y: -50, opacity: 0, ease: "back.out(1.7)" });
     updateLeaderboard();
     showConfetti();
 }
@@ -220,8 +222,14 @@ function toggleTheme() {
     const themeIcon = document.querySelector('#theme-toggle i');
     themeIcon.classList.toggle('fa-moon');
     themeIcon.classList.toggle('fa-sun');
+    
+    // Update puzzle pieces color
+    const puzzlePieces = document.querySelectorAll('.puzzle-piece');
+    puzzlePieces.forEach(piece => {
+        piece.style.color = getComputedStyle(document.body).getPropertyValue('--text-color');
+        piece.style.backgroundColor = getComputedStyle(document.body).getPropertyValue('--primary-color');
+    });
 }
-
 function updatePreviewImage() {
     const imageIndex = Math.floor(Math.random() * images.length);
     currentImageUrl = images[imageIndex];
