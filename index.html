@@ -3,34 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nature Puzzle Slider - Version 9</title>
+    <title>Enchanted Nature Slider - Version 10</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>Nature Puzzle Slider</h1>
+        <h1>Enchanted Nature Slider</h1>
         <div id="game-controls">
-            <button id="start-button">Start Game</button>
+            <button id="start-button"><i class="fas fa-play"></i> Start Game</button>
             <select id="difficulty">
                 <option value="3">Easy (3x3)</option>
                 <option value="4">Medium (4x4)</option>
                 <option value="5">Hard (5x5)</option>
+                <option value="6">Expert (6x6)</option>
             </select>
-            <button id="theme-toggle">Toggle Theme</button>
+            <button id="theme-toggle"><i class="fas fa-moon"></i> Toggle Theme</button>
         </div>
         <div id="game-area">
             <div id="puzzle-container"></div>
             <div id="game-info">
-                <p id="moves">Moves: 0</p>
-                <p id="timer">Time: 00:00</p>
+                <p id="moves"><i class="fas fa-shoe-prints"></i> Moves: 0</p>
+                <p id="timer"><i class="fas fa-clock"></i> Time: 00:00</p>
             </div>
         </div>
         <div id="message"></div>
+        <div id="preview-container">
+            <h3>Image Preview</h3>
+            <img id="preview-image" src="" alt="Puzzle Preview">
+        </div>
         <div id="leaderboard">
             <h2>Leaderboard</h2>
             <ul id="leaderboard-list"></ul>
         </div>
     </div>
+    <div id="confetti-container"></div>
+    <script src="https://cdn.jsdelivr.net/npm/confetti-js@0.0.18/dist/index.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

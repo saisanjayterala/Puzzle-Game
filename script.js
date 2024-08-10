@@ -5,13 +5,14 @@ let timer;
 let seconds = 0;
 let gameStarted = false;
 let leaderboard = [];
+let currentImageUrl = '';
 
 const images = [
-    'https://source.unsplash.com/300x300/?nature,water',
-    'https://source.unsplash.com/300x300/?nature,forest',
-    'https://source.unsplash.com/300x300/?nature,mountain',
-    'https://source.unsplash.com/300x300/?nature,beach',
-    'https://source.unsplash.com/300x300/?nature,sunset'
+    'https://source.unsplash.com/400x400/?nature,water',
+    'https://source.unsplash.com/400x400/?nature,forest',
+    'https://source.unsplash.com/400x400/?nature,mountain',
+    'https://source.unsplash.com/400x400/?nature,beach',
+    'https://source.unsplash.com/400x400/?nature,sunset'
 ];
 
 function initGame() {
@@ -20,6 +21,7 @@ function initGame() {
     createPuzzle(size);
     displayPuzzle();
     resetGameState();
+    updatePreviewImage();
 }
 
 function createPuzzle(size) {
@@ -62,18 +64,15 @@ function displayPuzzle() {
     container.innerHTML = '';
     container.style.gridTemplateColumns = `repeat(${puzzle.length}, 1fr)`;
 
-    const imageIndex = Math.floor(Math.random() * images.length);
-    const imageUrl = images[imageIndex];
-
     for (let i = 0; i < puzzle.length; i++) {
         for (let j = 0; j < puzzle[i].length; j++) {
             const piece = document.createElement('div');
-            piece.classList.add('puzzle-piece');
+            piece.classList.add('puzzle-piece', 'fade-in');
             if (puzzle[i][j] !== 0) {
                 piece.textContent = puzzle[i][j];
                 const bgPositionX = ((puzzle[i][j] - 1) % puzzle.length) / (puzzle.length - 1) * 100;
                 const bgPositionY = Math.floor((puzzle[i][j] - 1) / puzzle.length) / (puzzle.length - 1) * 100;
-                piece.style.backgroundImage = `url(${imageUrl})`;
+                piece.style.backgroundImage = `url(${currentImageUrl})`;
                 piece.style.backgroundPosition = `${bgPositionX}% ${bgPositionY}%`;
                 piece.addEventListener('click', () => movePiece(i, j));
             } else {
@@ -106,10 +105,37 @@ function movePiece(row, col) {
             moves++;
             updateMoves();
             displayPuzzle();
+            animateMove(row, col, newRow, newCol);
             checkWin();
             return;
         }
     }
+}
+
+function animateMove(fromRow, fromCol, toRow, toCol) {
+    const pieces = document.querySelectorAll('.puzzle-piece');
+    const fromIndex = fromRow * puzzle.length + fromCol;
+    const toIndex = toRow * puzzle.length + toCol;
+
+    const fromPiece = pieces[fromIndex];
+    const toPiece = pieces[toIndex];
+
+    const fromRect = fromPiece.getBoundingClientRect();
+    const toRect = toPiece.getBoundingClientRect();
+
+    const deltaX = toRect.left - fromRect.left;
+    const deltaY = toRect.top - fromRect.top;
+
+    fromPiece.style.zIndex = '10';
+    fromPiece.style.transition = 'transform 0.3s ease-in-out';
+    fromPiece.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+
+    setTimeout(() => {
+        fromPiece.style.zIndex = '';
+        fromPiece.style.transition = '';
+        fromPiece.style.transform = '';
+        displayPuzzle();
+    }, 300);
 }
 
 function checkWin() {
@@ -129,7 +155,7 @@ function checkWin() {
 function startGame() {
     gameStarted = true;
     timer = setInterval(updateTimer, 1000);
-    document.getElementById('start-button').textContent = 'Restart';
+    document.getElementById('start-button').innerHTML = '<i class="fas fa-redo"></i> Restart';
 }
 
 function endGame() {
@@ -137,7 +163,9 @@ function endGame() {
     const time = formatTime(seconds);
     const message = `Congratulations! You solved the puzzle in ${moves} moves and ${time}.`;
     document.getElementById('message').textContent = message;
+    document.getElementById('message').classList.add('slide-in');
     updateLeaderboard();
+    showConfetti();
 }
 
 function resetGameState() {
@@ -148,16 +176,16 @@ function resetGameState() {
     updateMoves();
     updateTimer();
     document.getElementById('message').textContent = '';
-    document.getElementById('start-button').textContent = 'Start Game';
+    document.getElementById('start-button').innerHTML = '<i class="fas fa-play"></i> Start Game';
 }
 
 function updateMoves() {
-    document.getElementById('moves').textContent = `Moves: ${moves}`;
+    document.getElementById('moves').innerHTML = `<i class="fas fa-shoe-prints"></i> Moves: ${moves}`;
 }
 
 function updateTimer() {
     const time = formatTime(seconds);
-    document.getElementById('timer').textContent = `Time: ${time}`;
+    document.getElementById('timer').innerHTML = `<i class="fas fa-clock"></i> Time: ${time}`;
     seconds++;
 }
 
@@ -181,17 +209,40 @@ function displayLeaderboard() {
     leaderboardList.innerHTML = '';
     leaderboard.forEach((entry, index) => {
         const li = document.createElement('li');
-        li.textContent = `${index + 1}. ${entry.difficulty}x${entry.difficulty} - Moves: ${entry.moves}, Time: ${entry.time}`;
+        li.innerHTML = `${index + 1}. ${entry.difficulty}x${entry.difficulty} - <i class="fas fa-shoe-prints"></i> ${entry.moves}, <i class="fas fa-clock"></i> ${entry.time}`;
+        li.classList.add('fade-in');
         leaderboardList.appendChild(li);
     });
 }
 
 function toggleTheme() {
     document.body.classList.toggle('dark-theme');
+    const themeIcon = document.querySelector('#theme-toggle i');
+    themeIcon.classList.toggle('fa-moon');
+    themeIcon.classList.toggle('fa-sun');
+}
+
+function updatePreviewImage() {
+    const imageIndex = Math.floor(Math.random() * images.length);
+    currentImageUrl = images[imageIndex];
+    const previewImage = document.getElementById('preview-image');
+    previewImage.src = currentImageUrl;
+    previewImage.alt = `Nature Preview ${imageIndex + 1}`;
+}
+
+function showConfetti() {
+    const confettiSettings = { target: 'confetti-container', max: 200, size: 2, animate: true, props: ['circle', 'square', 'triangle', 'line'], colors: [[165,104,246],[230,61,135],[0,199,228],[253,214,126]], clock: 25, rotate: true };
+    const confetti = new ConfettiGenerator(confettiSettings);
+    confetti.render();
+    
+    setTimeout(() => {
+        confetti.clear();
+    }, 5000);
 }
 
 document.getElementById('start-button').addEventListener('click', initGame);
 document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
 document.getElementById('difficulty').addEventListener('change', initGame);
 
+// Initialize the game
 initGame();
