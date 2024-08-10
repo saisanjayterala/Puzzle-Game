@@ -29,10 +29,7 @@ function onDrop(event) {
     const dropzone = event.target;
     if (dropzone.classList.contains('puzzle-slot') && !dropzone.hasChildNodes()) {
         dropzone.appendChild(draggableElement);
-        if (document.querySelectorAll('.puzzle-slot .puzzle-piece').length === 4) {
-            stopTimer();
-            alert('Puzzle Completed!');
-        }
+        checkCompletion();
     }
 }
 
@@ -40,13 +37,65 @@ function onDragOver(event) {
     event.preventDefault();
 }
 
-document.querySelectorAll('.puzzle-piece').forEach(piece => {
-    piece.addEventListener('dragstart', onDragStart);
-});
+function checkCompletion() {
+    const slots = document.querySelectorAll('.puzzle-slot');
+    let completed = true;
+    slots.forEach(slot => {
+        if (!slot.hasChildNodes()) {
+            completed = false;
+        }
+    });
+    if (completed) {
+        stopTimer();
+        alert('Puzzle Completed!');
+    }
+}
 
-document.querySelectorAll('.puzzle-slot').forEach(slot => {
-    slot.addEventListener('dragover', onDragOver);
-    slot.addEventListener('drop', onDrop);
-});
+function startLevel(level) {
+    const gameArea = document.getElementById('game-area');
+    const puzzleBoard = document.querySelector('.puzzle-board');
+    const dropZone = document.querySelector('.drop-zone');
+    const levelSelect = document.getElementById('level-select');
 
-startTimer();
+    // Clear previous puzzle pieces and slots
+    puzzleBoard.innerHTML = '';
+    dropZone.innerHTML = '';
+
+    // Set up pieces and slots based on the level
+    let pieceCount;
+    switch (level) {
+        case 1:
+            pieceCount = 4;
+            break;
+        case 2:
+            pieceCount = 6;
+            break;
+        case 3:
+            pieceCount = 9;
+            break;
+    }
+
+    for (let i = 1; i <= pieceCount; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'puzzle-piece';
+        piece.id = `piece${i}`;
+        piece.textContent = i;
+        piece.draggable = true;
+        piece.addEventListener('dragstart', onDragStart);
+        puzzleBoard.appendChild(piece);
+
+        const slot = document.createElement('div');
+        slot.className = 'puzzle-slot';
+        slot.id = `slot${i}`;
+        slot.addEventListener('dragover', onDragOver);
+        slot.addEventListener('drop', onDrop);
+        dropZone.appendChild(slot);
+    }
+
+    // Hide level selection and show game area
+    levelSelect.style.display = 'none';
+    gameArea.style.display = 'block';
+
+    startTimer();
+}
+    

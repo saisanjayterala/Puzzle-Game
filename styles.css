@@ -5,10 +5,38 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
-    background-color: #f0f0f0;
+    background-color: #e0f7fa;
 }
 
 .container {
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: #00796b;
+}
+
+#level-select {
+    margin-bottom: 20px;
+}
+
+.level-button {
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #00796b;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.level-button:hover {
+    background-color: #004d40;
+}
+
+#game-area {
     text-align: center;
 }
 
