@@ -8,6 +8,7 @@ let originalPieces = [];
 let difficulty = 'medium';
 let leaderboard = [];
 let playerProfile = { name: 'Player', highScore: 0 };
+let currentLevel = 1;
 
 function startTimer() {
     startTime = new Date();
@@ -35,8 +36,9 @@ function stopTimer() {
 function showMessage(message) {
     const messageElement = document.getElementById('message');
     messageElement.textContent = message;
+    messageElement.style.display = 'block';
     setTimeout(() => {
-        messageElement.textContent = '';
+        messageElement.style.display = 'none';
     }, 3000);
 }
 
@@ -81,6 +83,7 @@ function checkCompletion() {
 }
 
 function startLevel(level) {
+    currentLevel = level;
     const gameArea = document.getElementById('game-area');
     const puzzleBoard = document.querySelector('.puzzle-board');
     const dropZone = document.querySelector('.drop-zone');
@@ -122,7 +125,7 @@ function startLevel(level) {
         }
 
         puzzleBoard.appendChild(piece);
-        originalPieces.push(piece.id);
+        originalPieces.push(piece);
 
         const slot = document.createElement('div');
         slot.className = 'puzzle-slot';
@@ -180,71 +183,101 @@ function resetPuzzle() {
     const puzzleBoard = document.querySelector('.puzzle-board');
     const dropZone = document.querySelector('.drop-zone');
 
+    // Clear both puzzle board and drop zone
     puzzleBoard.innerHTML = '';
     dropZone.innerHTML = '';
 
-    originalPieces.forEach(id => {
-        const piece = document.getElementById(id);
-        puzzleBoard.appendChild(piece);
+    // Recreate puzzle pieces and slots
+    originalPieces.forEach((piece, index) => {
+        const newPiece = piece.cloneNode(true);
+        newPiece.classList.remove('correct');
+        newPiece.style.transform = 'none';
+        newPiece.addEventListener('dragstart', onDragStart);
+        puzzleBoard.appendChild(newPiece);
+
+        const slot = document.createElement('div');
+        slot.className = 'puzzle-slot';
+        slot.id = `slot${index + 1}`;
+        slot.addEventListener('dragover', onDragOver);
+        slot.addEventListener('drop', onDrop);
+        dropZone.appendChild(slot);
     });
 
-    document.querySelectorAll('.puzzle-slot').forEach(slot => {
-        slot.style.borderColor = '#999';
-        slot.classList.remove('correct');
-        slot.classList.remove('occupied');
-    });
+ // Reset game state
+ score = 0;
+ document.getElementById('score').textContent = `Score: ${score}`;
 
-    score = 0;
-    document.getElementById('score').textContent = `Score: ${score}`;
+ hintUsed = false;
+ hintsRemaining = 3;
+ document.getElementById('hint-button').textContent = `Hint (${hintsRemaining})`;
+ document.getElementById('hint-button').disabled = false;
 
-    stopTimer();
-    startTimer();
+ // Restart timer
+ stopTimer();
+ startTimer();
 }
 
 function updateScore() {
-    const timeElapsed = Math.floor((new Date() - startTime) / 1000);
-    score = Math.max(0, 1000 - timeElapsed); // Example scoring formula
-    document.getElementById('score').textContent = `Score: ${score}`;
+ const timeElapsed = Math.floor((new Date() - startTime) / 1000);
+ score = Math.max(0, 1000 - timeElapsed * 5);
+ document.getElementById('score').textContent = `Score: ${score}`;
 }
 
 function setTheme(theme) {
-    document.body.className = theme + '-mode';
+ document.body.className = theme + '-mode';
 }
 
 function startMultiplayer() {
-    alert('Multiplayer mode is not implemented yet.');
+ alert('Multiplayer mode is coming soon!');
 }
 
 function setDifficulty(level) {
-    difficulty = level;
-    alert(`Difficulty set to ${level}`);
+ difficulty = level;
+ showMessage(`Difficulty set to ${level}`);
 }
 
 function updateLeaderboard(finalScore) {
-    leaderboard.push({ score: finalScore });
-    leaderboard.sort((a, b) => b.score - a.score);
-    leaderboard = leaderboard.slice(0, 5); // Keep top 5 scores
+ leaderboard.push({ name: playerProfile.name, score: finalScore, level: currentLevel });
+ leaderboard.sort((a, b) => b.score - a.score);
+ leaderboard = leaderboard.slice(0, 5); // Keep top 5 scores
 }
 
 function displayLeaderboard() {
-    const leaderboardList = document.getElementById('leaderboard-list');
-    leaderboardList.innerHTML = '';
-    leaderboard.forEach(entry => {
-        const li = document.createElement('li');
-        li.textContent = `Score: ${entry.score}`;
-        leaderboardList.appendChild(li);
-    });
-    document.getElementById('leaderboard').style.display = 'block';
+ const leaderboardList = document.getElementById('leaderboard-list');
+ leaderboardList.innerHTML = '';
+ leaderboard.forEach((entry, index) => {
+     const li = document.createElement('li');
+     li.textContent = `${index + 1}. ${entry.name} - Score: ${entry.score} (Level ${entry.level})`;
+     leaderboardList.appendChild(li);
+ });
+ document.getElementById('leaderboard').style.display = 'block';
 }
 
 function savePlayerProfile(finalScore) {
-    if (finalScore > playerProfile.highScore) {
-        playerProfile.highScore = finalScore;
-    }
+ if (finalScore > playerProfile.highScore) {
+     playerProfile.highScore = finalScore;
+ }
 }
 
 function displayProfile() {
-    const profileInfo = document.getElementById('profile-info');
-    profileInfo.innerHTML = `<p>Name: ${playerProfile.name}</p><p>High Score: ${playerProfile.highScore}</p>`;
-    document.getElementById('profile').style.display = 'block';
+ const profileInfo = document.getElementById('profile-info');
+ profileInfo.innerHTML = `<p>Name: ${playerProfile.name}</p><p>High Score: ${playerProfile.highScore}</p>`;
+ document.getElementById('profile').style.display = 'block';
 }
+
+function updateProfileName() {
+ const newName = document.getElementById('profile-name').value.trim();
+ if (newName) {
+     playerProfile.name = newName;
+     displayProfile();
+     showMessage(`Profile name updated to ${newName}`);
+ } else {
+     showMessage('Please enter a valid name');
+ }
+}
+
+// Initialize the game
+document.addEventListener('DOMContentLoaded', () => {
+ displayProfile();
+ document.getElementById('level-select').style.display = 'block';
+});

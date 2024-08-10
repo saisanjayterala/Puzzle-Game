@@ -13,6 +13,7 @@ body {
 
 body.dark-mode {
     background-color: #212121;
+    color: #ffffff;
 }
 
 .container {
@@ -24,6 +25,10 @@ body.dark-mode {
 h1 {
     margin-bottom: 20px;
     color: #00796b;
+}
+
+body.dark-mode h1 {
+    color: #4db6ac;
 }
 
 #theme-select, #multiplayer-select, #level-select, #difficulty-select {
@@ -39,6 +44,7 @@ h1 {
     border-radius: 5px;
     cursor: pointer;
     font-size: 18px;
+    transition: background-color 0.3s;
 }
 
 .theme-button:hover, .multiplayer-button:hover, .level-button:hover, .difficulty-button:hover {
@@ -58,6 +64,10 @@ h1 {
     color: #388e3c;
 }
 
+body.dark-mode #score {
+    color: #81c784;
+}
+
 #hint-button, #shuffle-button, #reset-button {
     padding: 10px 20px;
     background-color: #0288d1;
@@ -67,6 +77,7 @@ h1 {
     cursor: pointer;
     margin-bottom: 20px;
     font-size: 18px;
+    transition: background-color 0.3s;
 }
 
 #shuffle-button {
@@ -74,12 +85,13 @@ h1 {
     margin-left: 10px;
 }
 
-#hint-button:hover, #shuffle-button:hover, #reset-button:hover {
-    background-color: #01579b;
+#reset-button {
+    background-color: #ffa000;
+    margin-left: 10px;
 }
 
-#shuffle-button:hover {
-    background-color: #c2185b;
+#hint-button:hover, #shuffle-button:hover, #reset-button:hover {
+    opacity: 0.8;
 }
 
 #message {
@@ -162,6 +174,10 @@ h1 {
     color: #00796b;
 }
 
+body.dark-mode #leaderboard h2, body.dark-mode #profile h2 {
+    color: #4db6ac;
+}
+
 #leaderboard-list {
     list-style-type: none;
     padding: 0;
@@ -174,6 +190,12 @@ h1 {
 
 #profile-info {
     font-size: 18px;
+}
+
+#profile-name {
+    padding: 10px;
+    font-size: 18px;
+    margin-bottom: 10px;
 }
 
 @media (max-width: 600px) {
