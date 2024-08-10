@@ -2,6 +2,7 @@ let startTime;
 let timerInterval;
 let hintUsed = false;
 let hintsRemaining = 3;
+let timeLimit = 120;
 
 function startTimer() {
     startTime = new Date();
@@ -11,8 +12,14 @@ function startTimer() {
 function updateTimer() {
     const now = new Date();
     const elapsedTime = Math.floor((now - startTime) / 1000);
-    const minutes = String(Math.floor(elapsedTime / 60)).padStart(2, '0');
-    const seconds = String(elapsedTime % 60).padStart(2, '0');
+    const remainingTime = timeLimit - elapsedTime;
+    if (remainingTime <= 0) {
+        clearInterval(timerInterval);
+        alert('Time\'s up! Game over.');
+        return;
+    }
+    const minutes = String(Math.floor(remainingTime / 60)).padStart(2, '0');
+    const seconds = String(remainingTime % 60).padStart(2, '0');
     document.getElementById('timer').textContent = `Time: ${minutes}:${seconds}`;
 }
 
@@ -69,11 +76,9 @@ function startLevel(level) {
     const dropZone = document.querySelector('.drop-zone');
     const levelSelect = document.getElementById('level-select');
 
-    // Clear previous puzzle pieces and slots
     puzzleBoard.innerHTML = '';
     dropZone.innerHTML = '';
 
-    // Set up pieces and slots based on the level
     let pieceCount;
     switch (level) {
         case 1:
@@ -97,6 +102,14 @@ function startLevel(level) {
         piece.textContent = i;
         piece.draggable = true;
         piece.addEventListener('dragstart', onDragStart);
+
+        if (level >= 4 && i % 3 === 0) {
+            piece.classList.add('triangle');
+            piece.textContent = '';
+        } else if (level >= 4 && i % 2 === 0) {
+            piece.classList.add('circle');
+        }
+
         puzzleBoard.appendChild(piece);
 
         const slot = document.createElement('div');
@@ -107,32 +120,43 @@ function startLevel(level) {
         dropZone.appendChild(slot);
     }
 
-    // Hide level selection and show game area
     levelSelect.style.display = 'none';
     gameArea.style.display = 'block';
 
     hintUsed = false;
     hintsRemaining = 3;
+    document.getElementById('hint-button').textContent = `Hint (${hintsRemaining})`;
+
+    stopTimer();
     startTimer();
 }
 
 function showHint() {
-    if (hintsRemaining <= 0) {
-        showMessage('No more hints available.');
-        return;
-    }
-
+    if (hintUsed || hintsRemaining <= 0) return;
     hintUsed = true;
     hintsRemaining--;
-    const pieces = document.querySelectorAll('.puzzle-piece');
+    const hintButton = document.getElementById('hint-button');
+    hintButton.textContent = `Hint (${hintsRemaining})`;
+    hintButton.disabled = hintsRemaining <= 0;
+
     const slots = document.querySelectorAll('.puzzle-slot');
-    pieces.forEach((piece, index) => {
-        if (!slots[index].hasChildNodes()) {
-            slots[index].style.borderColor = '#FF5722';
-            setTimeout(() => {
-                slots[index].style.borderColor = '#999';
-            }, 1000);
+    slots.forEach(slot => {
+        if (!slot.hasChildNodes()) {
+            slot.style.borderColor = '#ff5722';
         }
     });
-    showMessage(`Hint used! ${hintsRemaining} hints remaining.`);
+
+    setTimeout(() => {
+        slots.forEach(slot => {
+            slot.style.borderColor = '#999';
+        });
+        hintUsed = false;
+    }, 2000);
+}
+
+function shufflePieces() {
+    const puzzleBoard = document.querySelector('.puzzle-board');
+    for (let i = puzzleBoard.children.length; i >= 0; i--) {
+        puzzleBoard.appendChild(puzzleBoard.children[Math.random() * i | 0]);
+    }
 }

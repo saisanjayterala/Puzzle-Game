@@ -50,7 +50,7 @@ h1 {
     color: #d32f2f;
 }
 
-#hint-button {
+#hint-button, #shuffle-button {
     padding: 10px 20px;
     background-color: #0288d1;
     color: white;
@@ -61,8 +61,17 @@ h1 {
     font-size: 18px;
 }
 
-#hint-button:hover {
+#shuffle-button {
+    background-color: #d32f2f;
+    margin-left: 10px;
+}
+
+#hint-button:hover, #shuffle-button:hover {
     background-color: #01579b;
+}
+
+#shuffle-button:hover {
+    background-color: #c2185b;
 }
 
 #message {
@@ -89,11 +98,25 @@ h1 {
     font-size: 24px;
     cursor: move;
     margin: 5px;
+    border-radius: 10%;
+    transition: background-color 0.3s;
+}
+
+.puzzle-piece.circle {
+    border-radius: 50%;
+}
+
+.puzzle-piece.triangle {
+    width: 0;
+    height: 0;
+    border-left: 40px solid transparent;
+    border-right: 40px solid transparent;
+    border-bottom: 80px solid #4CAF50;
+    background-color: transparent;
 }
 
 .puzzle-piece.correct {
     background-color: #8bc34a;
-    transition: background-color 0.3s;
 }
 
 .drop-zone {
@@ -109,4 +132,18 @@ h1 {
     margin: 5px;
     border: 2px dashed #999;
     transition: border-color 0.3s;
+    border-radius: 10%;
+}
+
+@media (max-width: 600px) {
+    .puzzle-piece, .puzzle-slot {
+        width: 60px;
+        height: 60px;
+    }
+
+    .puzzle-piece.triangle {
+        border-left: 30px solid transparent;
+        border-right: 30px solid transparent;
+        border-bottom: 60px solid #4CAF50;
+    }
 }
