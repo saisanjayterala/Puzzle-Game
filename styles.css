@@ -154,6 +154,28 @@ h1 {
     background-color: #c8e6c9;
 }
 
+#leaderboard, #profile {
+    margin-top: 20px;
+}
+
+#leaderboard h2, #profile h2 {
+    color: #00796b;
+}
+
+#leaderboard-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+#leaderboard-list li {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+#profile-info {
+    font-size: 18px;
+}
+
 @media (max-width: 600px) {
     .puzzle-piece, .puzzle-slot {
         width: 60px;

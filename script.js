@@ -6,6 +6,8 @@ let timeLimit = 120;
 let score = 0;
 let originalPieces = [];
 let difficulty = 'medium';
+let leaderboard = [];
+let playerProfile = { name: 'Player', highScore: 0 };
 
 function startTimer() {
     startTime = new Date();
@@ -35,30 +37,28 @@ function showMessage(message) {
     messageElement.textContent = message;
     setTimeout(() => {
         messageElement.textContent = '';
-    }, 2000);
+    }, 3000);
 }
 
 function onDragStart(event) {
-    event.dataTransfer.setData("text/plain", event.target.id);
-}
-
-function onDrop(event) {
-    event.preventDefault();
-    const id = event.dataTransfer.getData("text");
-    const draggableElement = document.getElementById(id);
-    const dropzone = event.target;
-    if (dropzone.classList.contains('puzzle-slot') && !dropzone.hasChildNodes()) {
-        dropzone.appendChild(draggableElement);
-        draggableElement.classList.add('correct');
-        dropzone.classList.add('occupied');
-        showMessage('Piece placed correctly!');
-        updateScore();
-        checkCompletion();
-    }
+    event.dataTransfer.setData('text/plain', event.target.id);
 }
 
 function onDragOver(event) {
     event.preventDefault();
+}
+
+function onDrop(event) {
+    event.preventDefault();
+    const id = event.dataTransfer.getData('text/plain');
+    const piece = document.getElementById(id);
+    const slot = event.target;
+    if (slot.classList.contains('puzzle-slot') && !slot.hasChildNodes()) {
+        slot.appendChild(piece);
+        piece.classList.add('correct');
+        updateScore();
+        checkCompletion();
+    }
 }
 
 function checkCompletion() {
@@ -71,7 +71,12 @@ function checkCompletion() {
     });
     if (completed) {
         stopTimer();
-        showMessage('Puzzle completed!');
+        const finalScore = score;
+        showMessage(`Puzzle Completed! Your score: ${finalScore}`);
+        updateLeaderboard(finalScore);
+        displayLeaderboard();
+        savePlayerProfile(finalScore);
+        displayProfile();
     }
 }
 
@@ -213,4 +218,33 @@ function startMultiplayer() {
 function setDifficulty(level) {
     difficulty = level;
     alert(`Difficulty set to ${level}`);
+}
+
+function updateLeaderboard(finalScore) {
+    leaderboard.push({ score: finalScore });
+    leaderboard.sort((a, b) => b.score - a.score);
+    leaderboard = leaderboard.slice(0, 5); // Keep top 5 scores
+}
+
+function displayLeaderboard() {
+    const leaderboardList = document.getElementById('leaderboard-list');
+    leaderboardList.innerHTML = '';
+    leaderboard.forEach(entry => {
+        const li = document.createElement('li');
+        li.textContent = `Score: ${entry.score}`;
+        leaderboardList.appendChild(li);
+    });
+    document.getElementById('leaderboard').style.display = 'block';
+}
+
+function savePlayerProfile(finalScore) {
+    if (finalScore > playerProfile.highScore) {
+        playerProfile.highScore = finalScore;
+    }
+}
+
+function displayProfile() {
+    const profileInfo = document.getElementById('profile-info');
+    profileInfo.innerHTML = `<p>Name: ${playerProfile.name}</p><p>High Score: ${playerProfile.highScore}</p>`;
+    document.getElementById('profile').style.display = 'block';
 }
