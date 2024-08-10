@@ -1,5 +1,7 @@
 let startTime;
 let timerInterval;
+let hintUsed = false;
+let hintsRemaining = 3;
 
 function startTimer() {
     startTime = new Date();
@@ -18,6 +20,14 @@ function stopTimer() {
     clearInterval(timerInterval);
 }
 
+function showMessage(message) {
+    const messageElement = document.getElementById('message');
+    messageElement.textContent = message;
+    setTimeout(() => {
+        messageElement.textContent = '';
+    }, 2000);
+}
+
 function onDragStart(event) {
     event.dataTransfer.setData("text/plain", event.target.id);
 }
@@ -29,6 +39,8 @@ function onDrop(event) {
     const dropzone = event.target;
     if (dropzone.classList.contains('puzzle-slot') && !dropzone.hasChildNodes()) {
         dropzone.appendChild(draggableElement);
+        draggableElement.classList.add('correct');
+        showMessage('Piece placed correctly!');
         checkCompletion();
     }
 }
@@ -73,6 +85,9 @@ function startLevel(level) {
         case 3:
             pieceCount = 9;
             break;
+        case 4:
+            pieceCount = 12;
+            break;
     }
 
     for (let i = 1; i <= pieceCount; i++) {
@@ -96,6 +111,28 @@ function startLevel(level) {
     levelSelect.style.display = 'none';
     gameArea.style.display = 'block';
 
+    hintUsed = false;
+    hintsRemaining = 3;
     startTimer();
 }
-    
+
+function showHint() {
+    if (hintsRemaining <= 0) {
+        showMessage('No more hints available.');
+        return;
+    }
+
+    hintUsed = true;
+    hintsRemaining--;
+    const pieces = document.querySelectorAll('.puzzle-piece');
+    const slots = document.querySelectorAll('.puzzle-slot');
+    pieces.forEach((piece, index) => {
+        if (!slots[index].hasChildNodes()) {
+            slots[index].style.borderColor = '#FF5722';
+            setTimeout(() => {
+                slots[index].style.borderColor = '#999';
+            }, 1000);
+        }
+    });
+    showMessage(`Hint used! ${hintsRemaining} hints remaining.`);
+}

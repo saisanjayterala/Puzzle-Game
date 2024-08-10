@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puzzle Game - Version 2</title>
+    <title>Puzzle Game - Version 3</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -13,15 +13,14 @@
             <button class="level-button" onclick="startLevel(1)">Level 1</button>
             <button class="level-button" onclick="startLevel(2)">Level 2</button>
             <button class="level-button" onclick="startLevel(3)">Level 3</button>
+            <button class="level-button" onclick="startLevel(4)">Level 4</button>
         </div>
         <div id="game-area" style="display:none;">
             <div id="timer">Time: 00:00</div>
-            <div class="puzzle-board">
-                <!-- Puzzle pieces will be dynamically added here -->
-            </div>
-            <div class="drop-zone">
-                <!-- Drop zones will be dynamically added here -->
-            </div>
+            <button id="hint-button" onclick="showHint()">Hint</button>
+            <div id="message"></div>
+            <div class="puzzle-board"></div>
+            <div class="drop-zone"></div>
         </div>
     </div>
     <script src="script.js"></script>
