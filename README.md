@@ -1,4 +1,4 @@
-# Puzzle-Game
+https://saisanjayterala.github.io/Puzzle-Game/
 # Sliding Puzzle Game
 
 ## Table of Contents
