@@ -1,5 +1,6 @@
 https://saisanjayterala.github.io/Puzzle-Game/
 # Sliding Puzzle Game
+![image](https://github.com/user-attachments/assets/ab55ddd2-1b74-4929-a8d8-73e8c72587da)
 
 ## Table of Contents
 1. [Introduction](#introduction)
